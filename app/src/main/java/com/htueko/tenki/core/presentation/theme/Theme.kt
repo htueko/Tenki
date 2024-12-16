@@ -1,4 +1,4 @@
-package com.htueko.tenki.ui.theme
+package com.htueko.tenki.core.presentation.theme
 
 import android.app.Activity
 import android.os.Build
