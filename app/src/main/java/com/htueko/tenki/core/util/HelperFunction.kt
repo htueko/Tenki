@@ -1,5 +1,6 @@
 package com.htueko.tenki.core.util
 
+import androidx.compose.ui.Modifier
 import timber.log.Timber
 
 /**
@@ -41,3 +42,28 @@ fun logError(
 ) {
     Timber.tag(tag).e("$tag $message")
 }
+
+/**
+ * to get the name of the class.
+ *
+ * @return [String] name of the class, eg getClassName<TomAndJerry>() return "TomAndJerry"
+ */
+inline fun <reified T> getClassName(): String = T::class.java.simpleName
+
+/**
+ * Apply if
+ *
+ * @param condition condition to set the modifier. example if true apply this modifier else not.
+ * @param modifier
+ * @receiver
+ * @return Modifier.
+ */
+inline fun Modifier.applyIf(
+    condition: Boolean,
+    modifier: Modifier.() -> Modifier,
+): Modifier =
+    if (condition) {
+        then(modifier(this))
+    } else {
+        this
+    }
