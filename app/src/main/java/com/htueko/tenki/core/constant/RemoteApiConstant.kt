@@ -8,5 +8,6 @@ package com.htueko.tenki.core.constant
  */
 object RemoteApiConstant {
     const val BASE_URL = "https://api.weatherapi.com/v1/"
-    const val WEATHER_API_KEY = "PLACE_YOUR_KEY_HERE"
+   // const val WEATHER_API_KEY = "PLACE_YOUR_KEY_HERE"
+    const val WEATHER_API_KEY = "38d15d828e2f408eabd123045241712"
 }

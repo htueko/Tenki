@@ -1,14 +1,16 @@
 package com.htueko.tenki.core.di
 
 import com.htueko.tenki.core.constant.RemoteApiConstant
-import com.htueko.tenki.core.data.interceptor.ApiKeyInterceptor
+import com.htueko.tenki.core.data.interceptor.NetworkInspectorInterceptor
 import com.htueko.tenki.core.data.service.RemoteWeatherService
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -49,11 +51,13 @@ object RemoteModule {
      * @return An instance of OkHttpClient.
      */
     @Provides
-    fun provideOkHttpClient() =
-        OkHttpClient
-            .Builder()
-            .addInterceptor(ApiKeyInterceptor(provideApiKey()))
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        val networkInspectorInterceptor = NetworkInspectorInterceptor()
+        return OkHttpClient.Builder()
+            .addInterceptor(networkInspectorInterceptor)
             .build()
+    }
 
     /**
      * Provides an instance of Moshi, a JSON parsing library, with the KotlinJsonAdapterFactory
@@ -78,12 +82,14 @@ object RemoteModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val baseUrl =provideBaseUrl()
+        val moshi = provideMoshi()
         return Retrofit
             .Builder()
-            .baseUrl(provideBaseUrl())
+            .baseUrl(baseUrl)
             .client(okHttpClient)
-            .addConverterFactory(MoshiConverterFactory.create(provideMoshi()))
-            .client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build()
     }
 
@@ -94,7 +100,7 @@ object RemoteModule {
      * @return An instance of RemoteApiService.
      */
     @Provides
-    fun provideWeatherApiService(retrofit: Retrofit): RemoteWeatherService =
+    fun provideRemoteWeatherService(retrofit: Retrofit): RemoteWeatherService =
         retrofit.create(RemoteWeatherService::class.java)
 
 }

@@ -6,9 +6,9 @@ import retrofit2.http.GET
 import retrofit2.http.Query
  interface RemoteWeatherService {
     @GET("current.json")
-    fun getCurrentWeatherByLocation(
+    suspend fun getCurrentWeatherByLocation(
         @Query("key") apiKey: String,
         @Query("q") location: String,
-        @Query("aqi") aqi: String = "yes"
+        @Query("aqi") aqi: String = "no"
     ): Response<WeatherResponse>
 }

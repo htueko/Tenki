@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.moshi.kotlin)
     ksp(libs.moshi.kotlin.codegen)
     implementation(libs.okhttp)
+    implementation(libs.retrofit2.kotlin.coroutines.adapter)
 
     // image loading library
     implementation(libs.coil.compose)

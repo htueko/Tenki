@@ -1,5 +1,6 @@
 package com.htueko.tenki.core.data.datasource.remote.implementation
 
+import com.htueko.tenki.core.constant.RemoteApiConstant
 import com.htueko.tenki.core.data.datasource.remote.abstraction.RemoteWeatherDataSource
 import com.htueko.tenki.core.data.service.RemoteWeatherService
 import com.htueko.tenki.core.di.ApiKey
