@@ -38,11 +38,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -54,6 +54,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/LICENSE.md"
         }
     }
 }
@@ -121,6 +123,8 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.robolectric)
     testImplementation(libs.mockwebserver)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.core)
 
     // Instrumentation test
     androidTestImplementation(libs.kotlinx.coroutines.test)
