@@ -4,17 +4,17 @@ import com.squareup.moshi.Json
 
 data class LocationResponse(
     @Json(name = "id")
-    val id: Int,
+    val id: Int = 0,
     @Json(name = "name")
-    val name: String,
+    val name: String = "",
     @Json(name = "region")
-    val region: String,
+    val region: String = "",
     @Json(name = "country")
-    val country: String,
+    val country: String = "",
     @Json(name = "lat")
-    val lat: Double,
+    val lat: Double = 0.0,
     @Json(name = "lon")
-    val lon: Double,
+    val lon: Double = 0.0,
     @Json(name = "url")
-    val url: String
+    val url: String = ""
 )

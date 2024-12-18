@@ -5,6 +5,7 @@ import com.htueko.tenki.core.data.datasource.remote.abstraction.RemoteWeatherDat
 import com.htueko.tenki.core.data.service.RemoteWeatherService
 import com.htueko.tenki.core.domain.model.dto.Current
 import com.htueko.tenki.core.domain.model.dto.Location
+import com.htueko.tenki.core.domain.model.dto.LocationResponse
 import com.htueko.tenki.core.domain.model.dto.WeatherResponse
 import com.htueko.tenki.core.domain.model.status.ResultOf
 import com.squareup.moshi.Moshi
@@ -48,6 +49,7 @@ class RemoteWeatherDataSourceImplTest {
         feelslikeF = 78.0,
         uv = 1.1
     )
+    private val testLocationResponse = LocationResponse(name = "Tokyo")
     private val errorMessage = "HTTP 400 Bad Request"
     private val runtimeException = RuntimeException("Network error")
 
@@ -125,5 +127,62 @@ class RemoteWeatherDataSourceImplTest {
         Truth.assertThat(networkErrorResult.throwable.message).isNotEmpty()
         Truth.assertThat(networkErrorResult.throwable.message).isEqualTo(runtimeException.message)
     }
+
+    @Test
+    fun `searchLocation returns Success with location list when API call succeeds`() = runTest {
+        val locationResponseList = listOf(testLocationResponse)
+        val json = moshi.adapter<List<LocationResponse>>(List::class.java).toJson(locationResponseList)
+        val retrofitResponse = retrofit2.Response.success(locationResponseList)
+
+        whenever(mockRemoteWeatherService.searchLocation(apiKey, "Tokyo"))
+            .thenReturn(retrofitResponse)
+        server.enqueue(MockResponse().setResponseCode(200).setBody(json))
+
+        val result = dataSource.searchLocation("Tokyo")
+
+        Truth.assertThat(result).isInstanceOf(ResultOf.Success::class.java)
+        val successResult = result as ResultOf.Success<List<LocationResponse>>
+        Truth.assertThat(successResult.data).hasSize(1)
+        Truth.assertThat(successResult.data.first().name).isEqualTo("Tokyo")
+    }
+
+    @Test
+    fun `searchLocation returns ApiError when API returns error response`() = runTest {
+
+        val errorBody = errorMessage.toResponseBody("application/json".toMediaType())
+        val retrofitResponse = retrofit2.Response.error<List<LocationResponse>>(400, errorBody)
+
+        whenever(mockRemoteWeatherService.searchLocation(apiKey, "London"))
+            .thenReturn(retrofitResponse)
+        server.enqueue(MockResponse().setResponseCode(400).setBody(errorMessage))
+
+        val result = dataSource.searchLocation("London")
+
+        Truth.assertThat(result).isInstanceOf(ResultOf.ApiError::class.java)
+        val apiError = result as ResultOf.ApiError<List<LocationResponse>>
+        val actualErrorMessage = retrofitResponse.errorBody()?.string() ?: ""
+        Truth.assertThat(actualErrorMessage).isEqualTo(errorMessage)
+    }
+
+    @Test
+    fun `searchLocation returns NetworkError when network call fails`() = runTest {
+
+        val locationResponseList = listOf(testLocationResponse)
+        val json = moshi.adapter<List<LocationResponse>>(List::class.java).toJson(locationResponseList)
+        val retrofitResponse = retrofit2.Response.success(locationResponseList)
+
+        whenever(mockRemoteWeatherService.searchLocation(apiKey, "Tokyo")).thenReturn(retrofitResponse)
+        whenever(mockRemoteWeatherService.searchLocation(apiKey, "New York")).thenThrow(runtimeException)
+        server.enqueue(MockResponse().setResponseCode(200).setBody(json))
+
+        val result = dataSource.searchLocation("New York")
+
+        Truth.assertThat(result).isInstanceOf(ResultOf.NetworkError::class.java)
+        val networkError = result as ResultOf.NetworkError<List<LocationResponse>>
+        Truth.assertThat(networkError.throwable).isEqualTo(runtimeException)
+        Truth.assertThat(networkError.throwable.message).isEqualTo("Network error")
+    }
+
+
 
 }
