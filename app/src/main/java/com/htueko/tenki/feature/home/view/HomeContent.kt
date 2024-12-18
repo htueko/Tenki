@@ -9,7 +9,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +18,7 @@ import com.htueko.tenki.R
 import com.htueko.tenki.core.presentation.composable.FullScreenLoadingIndicator
 import com.htueko.tenki.core.presentation.composable.LocationTextField
 import com.htueko.tenki.core.presentation.composable.WeatherConditionCard
+import com.htueko.tenki.core.presentation.composable.WeatherDetailsCard
 import com.htueko.tenki.core.presentation.theme.TenkiTheme
 import com.htueko.tenki.core.presentation.theme.padding
 import com.htueko.tenki.feature.home.state.HomeUiState
@@ -34,6 +34,7 @@ internal fun HomeContent(
     val paddingEight = MaterialTheme.padding.eight
     val paddingSixteen = MaterialTheme.padding.sixteen
     val paddingTwentyFour = MaterialTheme.padding.twentyFour
+    val paddingFortyFour = MaterialTheme.padding.fortyFour
 
     Scaffold(
         modifier = Modifier
@@ -82,6 +83,7 @@ internal fun HomeContent(
 
                         // to show no location text or not
                         if (viewState.hasPreviousLocation) {
+                            // weather condition card
                             WeatherConditionCard(
                                 modifier = Modifier.constrainAs(weatherConditionCard) {
                                     start.linkTo(parent.start)
@@ -96,6 +98,21 @@ internal fun HomeContent(
                                 locationName = viewState.name,
                                 windDirection = viewState.windDirection,
                                 temperature = viewState.tempC,
+                            )
+                            // weather detail card
+                            WeatherDetailsCard(
+                                modifier = Modifier.constrainAs(weatherInfoCard) {
+                                    start.linkTo(parent.start, margin = paddingFortyFour)
+                                    end.linkTo(parent.end, margin = paddingFortyFour)
+                                    top.linkTo(
+                                        weatherConditionCard.bottom,
+                                        margin = paddingTwentyFour
+                                    )
+                                    width = Dimension.fillToConstraints
+                                },
+                                humidityValue = viewState.humidity.toString(),
+                                uvValue = viewState.vu.toString(),
+                                feelsLikeValue = viewState.feelsLikeC.toString(),
                             )
                         } else {
                             // no location section

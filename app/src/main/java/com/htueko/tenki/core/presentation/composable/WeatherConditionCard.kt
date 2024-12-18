@@ -33,6 +33,7 @@ fun WeatherConditionCard(
 ) {
 
     val paddingEight = MaterialTheme.padding.eight
+    val paddingSixteen = MaterialTheme.padding.sixteen
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -49,7 +50,10 @@ fun WeatherConditionCard(
         )
         // location name text and wind direction icon row
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(
+                top = paddingSixteen,
+                bottom = paddingSixteen,
+            ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
@@ -67,7 +71,7 @@ fun WeatherConditionCard(
         }
         // temperature text
         Text(
-            text = "${temperature.roundToInt()}\u02DA",
+            text = "${temperature.roundToInt()}°",
             style = TextStyle(
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Medium,
