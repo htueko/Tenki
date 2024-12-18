@@ -39,10 +39,10 @@ fun WeatherDetailsCard(
     val paddingSixteen = MaterialTheme.padding.sixteen
 
     Surface(
-        color = Color(0xFFF5F5F5),
         modifier = modifier
             .fillMaxWidth()
             .height(100.dp),
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp,
         shape = MaterialTheme.shapes.medium,
     ) {

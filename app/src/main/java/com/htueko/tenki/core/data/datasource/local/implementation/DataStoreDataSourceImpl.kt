@@ -14,6 +14,11 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
+/**
+ * Implements the [DataStoreDataSource] interface to provide a local data source for storing and retrieving location name data using the DataStore API.
+ *
+ * @property dataStore the DataStore instance used to store and retrieve preferences
+ */
 class DataStoreDataSourceImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : DataStoreDataSource {
@@ -24,12 +29,24 @@ class DataStoreDataSourceImpl @Inject constructor(
         val LOCATION_NAME_KEY = stringPreferencesKey("location_name")
     }
 
+    /**
+     * Sets the location name in the DataStore preferences.
+     *
+     * @param locationName the new location name to be stored
+     */
     override suspend fun setLocationName(locationName: String) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.LOCATION_NAME_KEY] = locationName
         }
     }
 
+    /**
+     * Retrieves the location name stored in the DataStore preferences.
+     *
+     * This method uses the DataStore API to fetch the location name from the preferences. If an IOException is encountered while reading the data, it will emit an empty set of preferences. Any other exceptions will be rethrown.
+     *
+     * @return a [Flow] of the location name stored in the preferences, or an empty string if the location name is not found.
+     */
     override fun getLocationName(): Flow<String> =
         dataStore.data
             .catch { exception ->

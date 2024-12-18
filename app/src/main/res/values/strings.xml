@@ -6,4 +6,5 @@
     <string name="humidity">Humidity</string>
     <string name="uv">UV</string>
     <string name="feels_like">Feels Like</string>
+    <string name="searching">Searching…</string>
 </resources>

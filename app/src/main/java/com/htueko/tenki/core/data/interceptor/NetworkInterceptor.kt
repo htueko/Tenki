@@ -5,6 +5,11 @@ import com.htueko.tenki.core.util.logInfo
 import okhttp3.Interceptor
 import okhttp3.Response
 
+/**
+ * An interceptor that logs information about network requests and responses.
+ * This interceptor is used to inspect the network traffic for debugging and monitoring purposes.
+ * It logs the request URL, headers, and the values of each header.
+ */
 class NetworkInspectorInterceptor : Interceptor {
     private val tag = getClassName<NetworkInspectorInterceptor>()
     override fun intercept(chain: Interceptor.Chain): Response {

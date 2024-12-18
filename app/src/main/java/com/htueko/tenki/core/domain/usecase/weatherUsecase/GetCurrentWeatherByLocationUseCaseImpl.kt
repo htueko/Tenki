@@ -5,6 +5,11 @@ import com.htueko.tenki.core.domain.model.status.ResultOf
 import com.htueko.tenki.core.domain.repository.RemoteWeatherRepository
 import javax.inject.Inject
 
+/**
+ * Implements the [GetCurrentWeatherByLocationUseCase] interface to retrieve the current weather for a given location.
+ *
+ * @param remoteWeatherRepository the repository responsible for fetching the current weather data from a remote source.
+ */
 class GetCurrentWeatherByLocationUseCaseImpl @Inject constructor(
     private val remoteWeatherRepository: RemoteWeatherRepository,
 ): GetCurrentWeatherByLocationUseCase {

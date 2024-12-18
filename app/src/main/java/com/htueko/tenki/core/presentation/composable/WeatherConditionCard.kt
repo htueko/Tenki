@@ -1,5 +1,6 @@
 package com.htueko.tenki.core.presentation.composable
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +24,16 @@ import com.htueko.tenki.core.presentation.theme.TenkiTheme
 import com.htueko.tenki.core.presentation.theme.padding
 import kotlin.math.roundToInt
 
+/**
+ * Composable function that displays a weather condition card with an icon, location name, wind direction, and temperature.
+ *
+ * @param modifier Modifier to be applied to the card.
+ * @param iconUrl URL of the weather icon to be displayed.
+ * @param weatherCondition Text description of the weather condition.
+ * @param locationName Name of the location.
+ * @param windDirection Angle in degrees representing the wind direction.
+ * @param temperature Current temperature value.
+ */
 @Composable
 fun WeatherConditionCard(
     modifier: Modifier = Modifier,

@@ -12,6 +12,7 @@ import com.htueko.tenki.core.domain.model.status.ResultOf
 import com.htueko.tenki.core.domain.usecase.dataStoreUsecase.GetLocationNameUseCase
 import com.htueko.tenki.core.domain.usecase.dataStoreUsecase.SetLocationNameUseCase
 import com.htueko.tenki.core.domain.usecase.weatherUsecase.GetCurrentWeatherByLocationUseCase
+import com.htueko.tenki.core.domain.usecase.weatherUsecase.SearchLocationUseCase
 import com.htueko.tenki.core.util.getClassName
 import com.htueko.tenki.core.util.logError
 import com.htueko.tenki.core.util.logInfo
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -44,6 +46,7 @@ class HomeViewModel @Inject constructor(
     private val getCurrentWeatherByLocationUseCase: GetCurrentWeatherByLocationUseCase,
     private val setLocationNameUseCase: SetLocationNameUseCase,
     private val getLocationNameUseCase: GetLocationNameUseCase,
+    private val searchLocationUseCase: SearchLocationUseCase,
 ) : ViewModel() {
 
     private val tag = getClassName<HomeViewModel>()
@@ -64,6 +67,7 @@ class HomeViewModel @Inject constructor(
         CoroutineExceptionHandler { coroutineContext, throwable ->
             logError(tag, "$coroutineContext and ${throwable.message.orEmpty()}")
         }
+
     private val uiContent = uiDispatcher + exceptionHandler
     private val ioContent = ioDispatcher + exceptionHandler
     private val defaultContent = defaultDispatcher + exceptionHandler
@@ -71,12 +75,39 @@ class HomeViewModel @Inject constructor(
     init {
         toggleLoadingIndicator(true)
         handlePreferencesChange()
+        handleEvent()
+    }
+
+    private fun handleEvent() {
+        viewModelScope.launch(ioDispatcher) {
+            _uiEvent.consumeAsFlow()
+                .collectLatest { event ->
+                    when (event) {
+                        is HomeEvent.GetCurrentWeatherByLocation -> {
+                            setLocationNameUseCase(event.name)
+                            toggleLoadingIndicator(true)
+                            getCurrentWeather(event.name)
+                        }
+
+                        HomeEvent.OnSearchIconClicked -> {
+                            toggleSearchingVisibility(true)
+                            queryLocation(locationNameText)
+                            // to clear the search text
+                            locationNameText = ""
+                        }
+                    }
+                }
+        }
     }
 
     private fun handlePreferencesChange() {
         viewModelScope.launch(ioContent) {
             getLocationNameUseCase()
                 .catch { throwable ->
+                    logInfo(
+                        tag,
+                        "handlePreferencesChange catch block throwable: ${throwable.message.orEmpty()}"
+                    )
                     withContext(uiContent) {
                         _viewState.update {
                             it.copy(
@@ -84,45 +115,45 @@ class HomeViewModel @Inject constructor(
                             )
                         }
                     }
-                    getCurrentWeather("London")
+                    toggleLoadingIndicator(false)
                 }
                 .collectLatest { locationName ->
-                    withContext(uiContent) {
-                        _viewState.update {
-                            it.copy(
-                                hasPreviousLocation = true,
-                            )
+                    logInfo(tag, "handlePreferencesChange location name: $locationName")
+                    if (locationName.isBlank()) {
+                        withContext(uiContent) {
+                            _viewState.update {
+                                it.copy(
+                                    hasPreviousLocation = false,
+                                )
+                            }
                         }
+                        toggleLoadingIndicator(false)
+                    } else {
+                        withContext(uiContent) {
+                            _viewState.update {
+                                it.copy(
+                                    hasPreviousLocation = true,
+                                )
+                            }
+                        }
+                        getCurrentWeather(locationName)
                     }
-                    getCurrentWeather(locationName)
                 }
         }
     }
 
     private fun getCurrentWeather(locationName: String) {
         viewModelScope.launch(ioContent) {
-            when (val response = getCurrentWeatherByLocationUseCase("London")) {
+            when (val response = getCurrentWeatherByLocationUseCase(locationName)) {
                 is ResultOf.ApiError -> {
                     logError(tag, "getCurrentWeather api error: ${response.message}")
-                    withContext(uiContent) {
-                        _viewState.update {
-                            it.copy(
-                                description = response.message
-                            )
-                        }
-                    }
+                    sendUiEffect(HomeEffect.ShowMessage(response.message))
                     toggleLoadingIndicator(false)
                 }
 
                 is ResultOf.NetworkError -> {
                     logError(tag, "getCurrentWeather network error: ${response.throwable.message}")
-                    withContext(uiContent) {
-                        _viewState.update {
-                            it.copy(
-                                description = if (response.throwable.message?.isBlank() == true) "is blank network error" else response.throwable.message.orEmpty()
-                            )
-                        }
-                    }
+                    sendUiEffect(HomeEffect.ShowMessage(response.throwable.cause?.message.toString()))
                     toggleLoadingIndicator(false)
                 }
 
@@ -142,6 +173,7 @@ class HomeViewModel @Inject constructor(
                                 lastUpdated = response.data.lastUpdated,
                                 description = response.data.description,
                                 windDirection = response.data.windDegree,
+                                hasQueryResult = false,
                             )
                         }
                     }
@@ -151,12 +183,60 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun queryLocation(query: String) {
+        viewModelScope.launch(ioContent) {
+            when (val response = searchLocationUseCase(query)) {
+                is ResultOf.ApiError -> {
+                    logError(tag, "queryLocation api error: ${response.message}")
+                    toggleSearchingVisibility(false)
+                    sendUiEffect(HomeEffect.ShowMessage(response.message))
+                }
+
+                is ResultOf.NetworkError -> {
+                    logError(tag, "queryLocation network error: ${response.throwable.message}")
+                    toggleSearchingVisibility(false)
+                    sendUiEffect(HomeEffect.ShowMessage(response.throwable.cause?.message.toString()))
+                }
+
+                is ResultOf.Success -> {
+                    if (response.data.isEmpty()) {
+                        sendUiEffect(HomeEffect.ShowMessage("There is an error for searching for location"))
+                    }
+                    logInfo(tag, "getCurrentWeather success: ${response.data}")
+                    _viewState.update {
+                        it.copy(
+                            hasQueryResult = response.data.isNotEmpty(),
+                            searchLocationList = response.data
+                        )
+                    }
+                    toggleSearchingVisibility(false)
+                }
+            }
+        }
+    }
+
+    fun onLocationNameValueChange(location: String) {
+        viewModelScope.launch(uiContent) {
+            locationNameText = location
+        }
+    }
+
     private fun toggleLoadingIndicator(value: Boolean) {
         viewModelScope.launch(uiContent) {
             _viewState.update {
                 it.copy(isLoading = value)
             }
         }
+        logInfo(tag, "toggleLoadingIndicator value is $value")
+    }
+
+    private fun toggleSearchingVisibility(value: Boolean) {
+        viewModelScope.launch(uiContent) {
+            _viewState.update {
+                it.copy(isSearching = value)
+            }
+        }
+        logInfo(tag, "toggleSearchingVisibility value is $value")
     }
 
     private fun sendUiEffect(effect: HomeEffect) {
@@ -164,13 +244,15 @@ class HomeViewModel @Inject constructor(
             logInfo(tag, "sendUiEffect effect is $effect")
             _uiEffect.send(effect)
         }
+        logInfo(tag, "sendUiEffect effect is $effect")
     }
 
-    private fun sendUiEvent(event: HomeEvent) {
+    fun sendUiEvent(event: HomeEvent) {
         viewModelScope.launch(uiContent) {
             logInfo(tag, "sendUiEvent event is $event")
             _uiEvent.send(event)
         }
+        logInfo(tag, "sendUiEvent event is $event")
     }
 
 }

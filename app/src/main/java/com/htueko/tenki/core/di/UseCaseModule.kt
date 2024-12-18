@@ -6,6 +6,8 @@ import com.htueko.tenki.core.domain.usecase.dataStoreUsecase.SetLocationNameUseC
 import com.htueko.tenki.core.domain.usecase.dataStoreUsecase.SetLocationNameUseCaseImpl
 import com.htueko.tenki.core.domain.usecase.weatherUsecase.GetCurrentWeatherByLocationUseCase
 import com.htueko.tenki.core.domain.usecase.weatherUsecase.GetCurrentWeatherByLocationUseCaseImpl
+import com.htueko.tenki.core.domain.usecase.weatherUsecase.SearchLocationUseCase
+import com.htueko.tenki.core.domain.usecase.weatherUsecase.SearchLocationUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -46,4 +48,15 @@ abstract class UseCaseModule {
      */
     @Binds
     abstract fun bindSetLocationNameUseCase(impl: SetLocationNameUseCaseImpl): SetLocationNameUseCase
+
+    /**
+     * Binds the implementation of [SearchLocationUseCase] to the abstract type.
+     * This allows Dagger to provide the appropriate implementation when the abstract
+     * type is requested.
+     *
+     * @param impl The implementation of [SearchLocationUseCase] to be bound.
+     * @return The bound [SearchLocationUseCase] implementation.
+     */
+    @Binds
+    abstract fun bindSearchLocationUseCase(impl: SearchLocationUseCaseImpl): SearchLocationUseCase
 }
