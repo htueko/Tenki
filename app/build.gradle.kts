@@ -129,7 +129,7 @@ dependencies {
 
     // Instrumentation test
     androidTestImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(libs.androidx.junit)

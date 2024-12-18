@@ -14,6 +14,7 @@ object RemoteWeatherMapper {
         humidity = dto.current.humidity,
         description = dto.current.condition.text,
         vu = dto.current.uv,
-        lastUpdated = dto.current.lastUpdated
+        lastUpdated = dto.current.lastUpdated,
+        windDegree = dto.current.windDegree,
     )
 }

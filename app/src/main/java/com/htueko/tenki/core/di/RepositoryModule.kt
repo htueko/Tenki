@@ -1,6 +1,8 @@
 package com.htueko.tenki.core.di
 
+import com.htueko.tenki.core.data.repository.DataStoreRepositoryImpl
 import com.htueko.tenki.core.data.repository.RemoteWeatherRepositoryImpl
+import com.htueko.tenki.core.domain.repository.DataStoreRepository
 import com.htueko.tenki.core.domain.repository.RemoteWeatherRepository
 import dagger.Binds
 import dagger.Module
@@ -20,4 +22,15 @@ abstract class RepositoryModule {
      */
     @Binds
     abstract fun bindRemoteWeatherRepository(impl: RemoteWeatherRepositoryImpl): RemoteWeatherRepository
+
+    /**
+     * Binds the implementation of [DataStoreRepository] to the abstract type.
+     * This allows Dagger to provide the appropriate implementation when the abstract
+     * type is requested.
+     *
+     * @param impl The implementation of [DataStoreRepository] to be bound.
+     * @return The bound [DataStoreRepository] implementation.
+     */
+    @Binds
+    abstract fun bindDataStoreRepository(impl: DataStoreRepositoryImpl): DataStoreRepository
 }

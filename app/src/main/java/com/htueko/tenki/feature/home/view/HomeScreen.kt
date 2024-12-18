@@ -17,6 +17,9 @@ fun HomeScreen(
 
     HomeContent(
         viewState = viewState,
+        locationNameValue = viewModel.locationNameText,
+        onLocationNameValueChange = {},
+        onSearchIconClicked = {},
     )
 
 }

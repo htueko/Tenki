@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Tenki</string>
+    <string name="location_hint_text">Search Location</string>
+    <string name="no_location_text_title">No City Selected</string>
+    <string name="no_location_text_desc">Please Search For A City</string>
 </resources>

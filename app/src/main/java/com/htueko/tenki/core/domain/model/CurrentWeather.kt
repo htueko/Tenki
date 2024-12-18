@@ -11,4 +11,5 @@ data class CurrentWeather(
     val description: String = "",
     val vu: Double = 0.0,
     val lastUpdated: String = "",
+    val windDegree: Int = 0,
 )

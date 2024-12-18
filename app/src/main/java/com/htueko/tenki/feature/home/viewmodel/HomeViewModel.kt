@@ -1,12 +1,16 @@
 package com.htueko.tenki.feature.home.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.htueko.tenki.core.di.DefaultDispatcher
 import com.htueko.tenki.core.di.IoDispatcher
 import com.htueko.tenki.core.di.MainDispatcher
-import com.htueko.tenki.core.domain.model.CurrentWeather
 import com.htueko.tenki.core.domain.model.status.ResultOf
+import com.htueko.tenki.core.domain.usecase.dataStoreUsecase.GetLocationNameUseCase
+import com.htueko.tenki.core.domain.usecase.dataStoreUsecase.SetLocationNameUseCase
 import com.htueko.tenki.core.domain.usecase.weatherUsecase.GetCurrentWeatherByLocationUseCase
 import com.htueko.tenki.core.util.getClassName
 import com.htueko.tenki.core.util.logError
@@ -21,6 +25,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,6 +42,8 @@ class HomeViewModel @Inject constructor(
     @DefaultDispatcher
     private val defaultDispatcher: CoroutineDispatcher,
     private val getCurrentWeatherByLocationUseCase: GetCurrentWeatherByLocationUseCase,
+    private val setLocationNameUseCase: SetLocationNameUseCase,
+    private val getLocationNameUseCase: GetLocationNameUseCase,
 ) : ViewModel() {
 
     private val tag = getClassName<HomeViewModel>()
@@ -49,6 +57,9 @@ class HomeViewModel @Inject constructor(
         MutableStateFlow(HomeUiState())
     internal val viewState: StateFlow<HomeUiState> = _viewState.asStateFlow()
 
+    var locationNameText by mutableStateOf("")
+        private set
+
     private val exceptionHandler =
         CoroutineExceptionHandler { coroutineContext, throwable ->
             logError(tag, "$coroutineContext and ${throwable.message.orEmpty()}")
@@ -59,20 +70,44 @@ class HomeViewModel @Inject constructor(
 
     init {
         toggleLoadingIndicator(true)
-        getCurrentWeather()
+        handlePreferencesChange()
     }
 
-    private fun getCurrentWeather() {
+    private fun handlePreferencesChange() {
+        viewModelScope.launch(ioContent) {
+            getLocationNameUseCase()
+                .catch { throwable ->
+                    withContext(uiContent) {
+                        _viewState.update {
+                            it.copy(
+                                hasPreviousLocation = false,
+                            )
+                        }
+                    }
+                    getCurrentWeather("London")
+                }
+                .collectLatest { locationName ->
+                    withContext(uiContent) {
+                        _viewState.update {
+                            it.copy(
+                                hasPreviousLocation = true,
+                            )
+                        }
+                    }
+                    getCurrentWeather(locationName)
+                }
+        }
+    }
+
+    private fun getCurrentWeather(locationName: String) {
         viewModelScope.launch(ioContent) {
             when (val response = getCurrentWeatherByLocationUseCase("London")) {
                 is ResultOf.ApiError -> {
                     logError(tag, "getCurrentWeather api error: ${response.message}")
-                    withContext(uiContent){
+                    withContext(uiContent) {
                         _viewState.update {
                             it.copy(
-                                currentWeather = CurrentWeather(
-                                    description = response.message
-                                )
+                                description = response.message
                             )
                         }
                     }
@@ -81,35 +116,32 @@ class HomeViewModel @Inject constructor(
 
                 is ResultOf.NetworkError -> {
                     logError(tag, "getCurrentWeather network error: ${response.throwable.message}")
-                    withContext(uiContent){
+                    withContext(uiContent) {
                         _viewState.update {
                             it.copy(
-                                currentWeather = CurrentWeather(
-                                    description = if(response.throwable.message?.isBlank() == true) "is blank network error" else response.throwable.message.orEmpty()
-                                )
+                                description = if (response.throwable.message?.isBlank() == true) "is blank network error" else response.throwable.message.orEmpty()
                             )
                         }
                     }
-                   toggleLoadingIndicator(false)
+                    toggleLoadingIndicator(false)
                 }
 
                 is ResultOf.Success -> {
                     logInfo(tag, "getCurrentWeather success: ${response.data}")
-                    withContext(uiContent){
+                    withContext(uiContent) {
                         _viewState.update {
                             it.copy(
-                                currentWeather = CurrentWeather(
-                                    name = response.data.name,
-                                    tempC = response.data.tempC,
-                                    tempF = response.data.tempF,
-                                    feelsLikeC = response.data.feelsLikeC,
-                                    feelsLikeF = response.data.feelsLikeF,
-                                    icon = response.data.icon,
-                                    humidity = response.data.humidity,
-                                    vu = response.data.vu,
-                                    lastUpdated = response.data.lastUpdated,
-                                    description = response.data.description
-                                )
+                                name = response.data.name,
+                                tempC = response.data.tempC,
+                                tempF = response.data.tempF,
+                                feelsLikeC = response.data.feelsLikeC,
+                                feelsLikeF = response.data.feelsLikeF,
+                                icon = response.data.icon,
+                                humidity = response.data.humidity,
+                                vu = response.data.vu,
+                                lastUpdated = response.data.lastUpdated,
+                                description = response.data.description,
+                                windDirection = response.data.windDegree,
                             )
                         }
                     }
