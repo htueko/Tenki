@@ -1,6 +1,5 @@
-package com.htueko.tenki.ui.theme
+package com.htueko.tenki.core.presentation.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,19 +8,30 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = White,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    background = Grey,
+    onBackground = White,
+    surface = Gainsboro,
+    error = Cyan,
+    onError = Magenta,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
+    primary = Grey,
     secondary = PurpleGrey40,
-    tertiary = Pink40
-
+    tertiary = Pink40,
+    background = White,
+    onBackground = Grey,
+    surface = Gainsboro,
+    error = Red,
+    onError = Color.White,
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
@@ -50,9 +60,18 @@ fun TenkiTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalPadding provides Padding(),
+        LocalCornerRadius provides CornerRadius(),
+        LocalStrokeWidth provides StrokeWidth(),
+        LocalSize provides Size(),
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content,
+            shapes = shapes,
+        )
+    }
+
 }
