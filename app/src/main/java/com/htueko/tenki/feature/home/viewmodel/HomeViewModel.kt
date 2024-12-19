@@ -116,6 +116,7 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                     toggleLoadingIndicator(false)
+                    sendUiEffect(HomeEffect.ShowMessage(throwable.message.toString()))
                 }
                 .collectLatest { locationName ->
                     logInfo(tag, "handlePreferencesChange location name: $locationName")
