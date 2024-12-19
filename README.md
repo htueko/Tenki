@@ -1,34 +1,81 @@
 # Tenki Weather App
 
-A modern Android weather application built with Kotlin that provides weather information using the WeatherAPI.com service.
+A sophisticated Android weather application built with modern Android development practices, emphasizing clean architecture, MVVM pattern, and robust data handling.
 
-Clone the repository
-git clone https://github.com/yourusername/tenki.git
+## Architecture & Design
 
-Get your API key from WeatherAPI.com
-Navigate to app/src/main/java/com/htueko/tenki/core/constant/RemoteApiConstant.kt
-Replace PLACE_YOUR_KEY_HERE with your actual API key:
-const val WEATHER_API_KEY = "your_api_key_here"
+The app follows Clean Architecture principles with MVVM pattern:
+- Presentation Layer: MVVM with ViewModels and UI States
+- Domain Layer: Use Cases and Business Logic
+- Data Layer: Repository Pattern with Local and Remote Data Sources
 
-The project uses Gradle as the build system. To build and run the app:
-Windows: Use the included gradlew.bat script
-macOS/Linux: Use the gradlew script
+## Key Technical Features
 
-Features:
-Real-time weather information
-Weather forecasts
-Clean Architecture implementation
-Modern Android development practices
+### Clean Architecture Implementation
+- Clear separation of concerns
+- Independent layers with defined boundaries
+- Dependency injection for better testability
+- Use cases for business logic encapsulation
 
-Tech Stack:
-Kotlin
-Android Architecture Components
-Retrofit for API communication
-Base URL: https://api.weatherapi.com/v1/
+### Local Storage
+- Room Database for persistent storage
+- Efficient caching of weather data
+- Reliable city selection persistence
+- Offline-first approach
 
-This project is licensed under the Apache License, Version 2.0. See the LICENSE file for details.
+### Network Layer
+- Retrofit integration with WeatherAPI.com
+- Coroutines for async operations
+- Comprehensive error handling
+- Clean API response mapping
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Weather Details
+- Current weather conditions
+- Temperature and "feels like" metrics
+- Humidity levels
+- UV index tracking
+- Weather condition icons
+- Extended forecasts
 
+### Modern Android Stack
+- Kotlin
+- Coroutines for async operations
+- Flow for reactive programming
+- Hilt for dependency injection
+- Room for local storage
+- Retrofit for API communication
+- ViewModel and LiveData
+- Material Design components
 
+## Setup
 
+1. Clone the repository:
+   git clone https://github.com/yourusername/tenki.git
+
+2. API Configuration:
+- Obtain API key from WeatherAPI.com
+- Navigate to app/src/main/java/com/htueko/tenki/core/constant/RemoteApiConstant.kt
+- Replace PLACE_YOUR_KEY_HERE with your API key
+  Base URL: https://api.weatherapi.com/v1/
+
+## Build & Testing
+
+- Comprehensive unit tests for each layer
+- Integration tests for data flow
+- UI tests for critical user journeys
+- Gradle-based build system
+- Windows: gradlew.bat
+- macOS/Linux: ./gradlew
+
+## Code Quality
+
+- Kotlin coding conventions
+- Clean Architecture principles
+- SOLID principles
+- Dependency injection
+- Comprehensive error handling
+- Proper documentation
+
+Licensed under Apache License, Version 2.0
+
+Contributions welcome through pull requests.
