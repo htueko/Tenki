@@ -5,6 +5,7 @@ import com.htueko.tenki.core.data.service.RemoteWeatherService
 import com.htueko.tenki.core.di.ApiKey
 import com.htueko.tenki.core.domain.model.dto.LocationResponse
 import com.htueko.tenki.core.domain.model.dto.WeatherResponse
+import com.htueko.tenki.core.domain.model.status.ApiError
 import com.htueko.tenki.core.domain.model.status.ResultOf
 import com.htueko.tenki.core.util.getClassName
 import com.htueko.tenki.core.util.logError
@@ -38,11 +39,15 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 logInfo(tag, "getCurrentWeatherByLocation response body: ${response.body()}")
                 ResultOf.Success(response.body()!!)
             } else {
-                logError(
-                    tag,
-                    "getCurrentWeatherByLocation response api error: ${response.message()}"
-                )
-                ResultOf.ApiError(response.message())
+                if (response.code() in 400..499) {
+                    val apiError = ApiError.entries.find { it.httpCode == response.code() }
+                    val errorMessage = apiError?.message ?: response.errorBody()?.string() ?: response.message()
+                    logError(tag, "getCurrentWeatherByLocation client error: $errorMessage")
+                    ResultOf.ApiError(errorMessage)
+                } else {
+                    logError(tag, "getCurrentWeatherByLocation response api error: ${response.message()}")
+                    ResultOf.ApiError(response.message())
+                }
             }
         } catch (e: Exception) {
             logError(tag, "getCurrentWeatherByLocation exception: $e")
@@ -68,11 +73,15 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 logInfo(tag, "searchLocation response body: ${response.body()}")
                 ResultOf.Success(response.body()!!)
             } else {
-                logError(
-                    tag,
-                    "searchLocation response api error: ${response.message()}"
-                )
-                ResultOf.ApiError(response.message())
+                if (response.code() in 400..499) {
+                    val apiError = ApiError.entries.find { it.httpCode == response.code() }
+                    val errorMessage = apiError?.message ?: response.errorBody()?.string() ?: response.message()
+                    logError(tag, "getCurrentWeatherByLocation client error: $errorMessage")
+                    ResultOf.ApiError(errorMessage)
+                } else {
+                    logError(tag, "getCurrentWeatherByLocation response api error: ${response.message()}")
+                    ResultOf.ApiError(response.message())
+                }
             }
         } catch (e: Exception) {
             logError(tag, "searchLocation exception: $e")
