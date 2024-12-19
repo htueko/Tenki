@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,14 +18,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.htueko.tenki.R
+import com.htueko.tenki.core.presentation.composable.ConnectivityObserver
 import com.htueko.tenki.core.presentation.composable.FullScreenLoadingIndicator
 import com.htueko.tenki.core.presentation.composable.LocationTextField
 import com.htueko.tenki.core.presentation.composable.SearchLocationItem
@@ -49,6 +55,20 @@ internal fun HomeContent(
     val paddingTwentyFour = MaterialTheme.padding.twentyFour
     val paddingFortyFour = MaterialTheme.padding.fortyFour
 
+    var isConnected by rememberSaveable {
+        mutableStateOf(true)
+    }
+
+    ConnectivityObserver(
+        ConnectedContent = {
+            isConnected = true
+        },
+        DisconnectedContent = {
+            isConnected = false
+        },
+    )
+
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -71,6 +91,7 @@ internal fun HomeContent(
                         val centerColumnGuideLine = createGuidelineFromTop(0.6f)
 
                         val (
+                            connectivityText,
                             locationTextField,
                             searchIndicator,
                             noLocationTextTitle,
@@ -80,13 +101,47 @@ internal fun HomeContent(
                             locationList,
                         ) = createRefs()
 
+                        // to show the connectivity text
+                        AnimatedVisibility(
+                            modifier = Modifier.constrainAs(connectivityText) {
+                                start.linkTo(parent.start, margin = paddingSixteen)
+                                end.linkTo(parent.end, margin = paddingSixteen)
+                                top.linkTo(parent.top, margin = paddingEight)
+                                width = Dimension.fillToConstraints
+                            },
+                            visible = isConnected.not(),
+                            enter = fadeIn(animationSpec = tween(1000)),
+                            exit = fadeOut(animationSpec = tween(1000)),
+                        ) {
+                            // This block will be shown when visible
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.error),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(paddingSixteen),
+                                    text = stringResource(R.string.network_is_not_available),
+                                    color = MaterialTheme.colorScheme.onError,
+                                )
+                            }
+
+                        }
+
                         // search text field
                         LocationTextField(
                             modifier = Modifier.constrainAs(locationTextField) {
                                 start.linkTo(parent.start, margin = paddingSixteen)
                                 end.linkTo(parent.end, margin = paddingSixteen)
                                 width = Dimension.fillToConstraints
-                                top.linkTo(parent.top, margin = paddingTwentyFour)
+                                top.linkTo(
+                                    if (isConnected) parent.top else connectivityText.bottom,
+                                    margin = paddingTwentyFour
+                                )
                             },
                             value = locationNameValue,
                             onValueChange = onLocationNameValueChange,
@@ -97,7 +152,7 @@ internal fun HomeContent(
 
                         // to show the searching when user clicked the search icon
                         AnimatedVisibility(
-                            modifier = Modifier.constrainAs(searchIndicator){
+                            modifier = Modifier.constrainAs(searchIndicator) {
                                 start.linkTo(parent.start, margin = paddingSixteen)
                                 end.linkTo(parent.end, margin = paddingSixteen)
                                 top.linkTo(locationTextField.bottom, paddingEight)
@@ -144,7 +199,7 @@ internal fun HomeContent(
                                     )
                                 }
                             }
-                        }else {
+                        } else {
 
                             // to show no location text or weather info
                             if (viewState.hasPreviousLocation) {

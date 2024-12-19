@@ -1,6 +1,9 @@
 package com.htueko.tenki.core.util
 
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.compose.ui.Modifier
+import com.htueko.tenki.core.domain.model.status.ConnectionState
 import timber.log.Timber
 
 /**
