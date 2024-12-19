@@ -4,7 +4,7 @@ A sophisticated Android weather application built with modern Android developmen
 
 ## Architecture & Design
 
-The app follows Clean Architecture principles with MVVM pattern:
+The app follows Clean Architecture principles with MVI pattern:
 - Presentation Layer: MVVM with ViewModels and UI States
 - Domain Layer: Use Cases and Business Logic
 - Data Layer: Repository Pattern with Local and Remote Data Sources
@@ -18,7 +18,7 @@ The app follows Clean Architecture principles with MVVM pattern:
 - Use cases for business logic encapsulation
 
 ### Local Storage
-- Room Database for persistent storage
+- Datastore for persistent storage
 - Efficient caching of weather data
 - Reliable city selection persistence
 - Offline-first approach
@@ -35,7 +35,7 @@ The app follows Clean Architecture principles with MVVM pattern:
 - Humidity levels
 - UV index tracking
 - Weather condition icons
-- Extended forecasts
+- Correct Wind Direction Icons.
 
 ### Modern Android Stack
 - Kotlin
@@ -44,7 +44,8 @@ The app follows Clean Architecture principles with MVVM pattern:
 - Hilt for dependency injection
 - Room for local storage
 - Retrofit for API communication
-- ViewModel and LiveData
+- ViewModel
+- Compose
 - Material Design components
 
 ## Setup
