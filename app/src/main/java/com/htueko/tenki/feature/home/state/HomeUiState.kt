@@ -7,6 +7,7 @@ import com.htueko.tenki.core.domain.model.SearchModel
  * Represents the UI state for the home screen of the Tenki weather app.
  *
  * @property isLoading Indicates whether the app is currently loading data.
+ * @property hasError Indicated whether the server has error or not.
  * @property hasPreviousLocation Indicates whether the app has a previously saved location.
  * @property isSearching Indicates whether the user is currently searching for a location.
  * @property hasQueryResult Indicates whether the search query has returned any results.
@@ -25,6 +26,7 @@ import com.htueko.tenki.core.domain.model.SearchModel
  */
 data class HomeUiState(
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
     val hasPreviousLocation: Boolean = false,
     val isSearching: Boolean = false,
     val hasQueryResult: Boolean = false,

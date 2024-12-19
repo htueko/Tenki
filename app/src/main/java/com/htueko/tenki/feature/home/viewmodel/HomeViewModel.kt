@@ -148,6 +148,13 @@ class HomeViewModel @Inject constructor(
             when (val response = getCurrentWeatherByLocationUseCase(locationName)) {
                 is ResultOf.ApiError -> {
                     logError(tag, "getCurrentWeather api error: ${response.message}")
+                    withContext(uiContent){
+                        _viewState.update {
+                            it.copy(
+                                hasError = true,
+                            )
+                        }
+                    }
                     sendUiEffect(HomeEffect.ShowMessage(response.message))
                     toggleLoadingIndicator(false)
                 }
@@ -161,22 +168,24 @@ class HomeViewModel @Inject constructor(
                 is ResultOf.Success -> {
                     logInfo(tag, "getCurrentWeather success: ${response.data}")
                     withContext(uiContent) {
-                        _viewState.update {
-                            it.copy(
-                                name = response.data.name,
-                                tempC = response.data.tempC,
-                                tempF = response.data.tempF,
-                                feelsLikeC = response.data.feelsLikeC,
-                                feelsLikeF = response.data.feelsLikeF,
-                                icon = response.data.icon,
-                                humidity = response.data.humidity,
-                                vu = response.data.vu,
-                                lastUpdated = response.data.lastUpdated,
-                                description = response.data.description,
-                                windDirection = response.data.windDegree,
-                                hasQueryResult = false,
-                            )
-                        }
+                            _viewState.update {
+                                it.copy(
+                                    hasError = response.data.name.isBlank(),
+                                    name = response.data.name,
+                                    tempC = response.data.tempC,
+                                    tempF = response.data.tempF,
+                                    feelsLikeC = response.data.feelsLikeC,
+                                    feelsLikeF = response.data.feelsLikeF,
+                                    icon = response.data.icon,
+                                    humidity = response.data.humidity,
+                                    vu = response.data.vu,
+                                    lastUpdated = response.data.lastUpdated,
+                                    description = response.data.description,
+                                    windDirection = response.data.windDegree,
+                                    hasQueryResult = false,
+                                )
+                            }
+                        logInfo(tag, "updated ui state: ${_viewState.value}")
                     }
                     toggleLoadingIndicator(false)
                 }

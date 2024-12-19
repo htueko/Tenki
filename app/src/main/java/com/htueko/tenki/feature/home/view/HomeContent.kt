@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -94,6 +95,7 @@ internal fun HomeContent(
                             connectivityText,
                             locationTextField,
                             searchIndicator,
+                            errorText,
                             noLocationTextTitle,
                             noLocationTextDescription,
                             weatherConditionCard,
@@ -201,77 +203,94 @@ internal fun HomeContent(
                             }
                         } else {
 
-                            // to show no location text or weather info
-                            if (viewState.hasPreviousLocation) {
-                                // weather condition card
-                                WeatherConditionCard(
-                                    modifier = Modifier.constrainAs(weatherConditionCard) {
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                        top.linkTo(
-                                            locationTextField.bottom,
-                                            margin = paddingTwentyFour
-                                        )
-                                        bottom.linkTo(centerColumnGuideLine)
-                                        width = Dimension.fillToConstraints
-                                        height = Dimension.fillToConstraints
-                                    },
-                                    iconUrl = viewState.icon,
-                                    weatherCondition = viewState.description,
-                                    locationName = viewState.name,
-                                    windDirection = viewState.windDirection,
-                                    temperature = viewState.tempC,
-                                )
-                                // weather detail card
-                                WeatherDetailsCard(
-                                    modifier = Modifier.constrainAs(weatherInfoCard) {
-                                        start.linkTo(parent.start, margin = paddingFortyFour)
-                                        end.linkTo(parent.end, margin = paddingFortyFour)
-                                        top.linkTo(
-                                            weatherConditionCard.bottom,
-                                            margin = paddingTwentyFour
-                                        )
-                                        width = Dimension.fillToConstraints
-                                    },
-                                    humidityValue = viewState.humidity.toString(),
-                                    uvValue = viewState.vu.toString(),
-                                    feelsLikeValue = viewState.feelsLikeC.toString(),
-                                )
-
-
-                            } else {
-                                // no location section
+                            if (viewState.hasError){
                                 // no location text title
                                 Text(
-                                    modifier = Modifier.constrainAs(noLocationTextTitle) {
+                                    modifier = Modifier.constrainAs(errorText) {
                                         start.linkTo(parent.start)
                                         end.linkTo(parent.end)
                                         width = Dimension.fillToConstraints
                                         bottom.linkTo(centerColumnGuideLine)
                                     },
-                                    text = stringResource(id = R.string.no_location_text_title),
+                                    text = stringResource(id = R.string.error_text),
                                     style = MaterialTheme.typography.titleLarge,
                                     textAlign = TextAlign.Center,
-                                    maxLines = 1,
+                                    overflow = TextOverflow.Visible,
                                     color = MaterialTheme.colorScheme.onBackground,
                                 )
-                                // no location text description
-                                Text(
-                                    modifier = Modifier.constrainAs(noLocationTextDescription) {
-                                        start.linkTo(parent.start)
-                                        end.linkTo(parent.end)
-                                        width = Dimension.fillToConstraints
-                                        top.linkTo(
-                                            noLocationTextTitle.bottom,
-                                            margin = paddingSixteen
-                                        )
-                                    },
-                                    text = stringResource(id = R.string.no_location_text_desc),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                )
+                            }else {
+
+                                // to show no location text or weather info
+                                if (viewState.hasPreviousLocation) {
+                                    // weather condition card
+                                    WeatherConditionCard(
+                                        modifier = Modifier.constrainAs(weatherConditionCard) {
+                                            start.linkTo(parent.start)
+                                            end.linkTo(parent.end)
+                                            top.linkTo(
+                                                locationTextField.bottom,
+                                                margin = paddingTwentyFour
+                                            )
+                                            bottom.linkTo(centerColumnGuideLine)
+                                            width = Dimension.fillToConstraints
+                                            height = Dimension.fillToConstraints
+                                        },
+                                        iconUrl = viewState.icon,
+                                        weatherCondition = viewState.description,
+                                        locationName = viewState.name,
+                                        windDirection = viewState.windDirection,
+                                        temperature = viewState.tempC,
+                                    )
+                                    // weather detail card
+                                    WeatherDetailsCard(
+                                        modifier = Modifier.constrainAs(weatherInfoCard) {
+                                            start.linkTo(parent.start, margin = paddingFortyFour)
+                                            end.linkTo(parent.end, margin = paddingFortyFour)
+                                            top.linkTo(
+                                                weatherConditionCard.bottom,
+                                                margin = paddingTwentyFour
+                                            )
+                                            width = Dimension.fillToConstraints
+                                        },
+                                        humidityValue = viewState.humidity.toString(),
+                                        uvValue = viewState.vu.toString(),
+                                        feelsLikeValue = viewState.feelsLikeC.toString(),
+                                    )
+
+                                } else {
+                                    // no location section
+                                    // no location text title
+                                    Text(
+                                        modifier = Modifier.constrainAs(noLocationTextTitle) {
+                                            start.linkTo(parent.start)
+                                            end.linkTo(parent.end)
+                                            width = Dimension.fillToConstraints
+                                            bottom.linkTo(centerColumnGuideLine)
+                                        },
+                                        text = stringResource(id = R.string.no_location_text_title),
+                                        style = MaterialTheme.typography.titleLarge,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                    )
+                                    // no location text description
+                                    Text(
+                                        modifier = Modifier.constrainAs(noLocationTextDescription) {
+                                            start.linkTo(parent.start)
+                                            end.linkTo(parent.end)
+                                            width = Dimension.fillToConstraints
+                                            top.linkTo(
+                                                noLocationTextTitle.bottom,
+                                                margin = paddingSixteen
+                                            )
+                                        },
+                                        text = stringResource(id = R.string.no_location_text_desc),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                    )
+                                }
                             }
                         }
                     }
