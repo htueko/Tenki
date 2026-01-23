@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.stability.analyzer)
 }
 
 android {
@@ -108,6 +109,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.navigation.compose)
 
     // Shimmer effect
     implementation(libs.compose.shimmer)
@@ -117,6 +119,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     testImplementation(libs.androidx.room.testing)
+
+    // Animation
+    implementation(libs.lottie.compose)
 
     // Logging
     implementation(libs.timber)
