@@ -29,6 +29,9 @@ jobs:
         env:
             _JAVA_OPTIONS: "-Xmx2g"
 
+      - name: Find generated docs
+        run: find . -name "index.html"
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
