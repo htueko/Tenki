@@ -26,7 +26,7 @@ jobs:
 
       - name: Build Dokka HTML
         run: ./gradlew :app:dokkaGeneratePublicationHtml --no-daemon
-          env:
+        env:
             _JAVA_OPTIONS: "-Xmx2g"
 
       - name: Deploy to GitHub Pages
