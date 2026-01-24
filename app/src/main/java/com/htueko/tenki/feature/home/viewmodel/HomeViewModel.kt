@@ -37,11 +37,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    @IoDispatcher
+    @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher,
-    @MainDispatcher
+    @param:MainDispatcher
     private val uiDispatcher: CoroutineDispatcher,
-    @DefaultDispatcher
+    @param:DefaultDispatcher
     private val defaultDispatcher: CoroutineDispatcher,
     private val getCurrentWeatherByLocationUseCase: GetCurrentWeatherByLocationUseCase,
     private val setLocationNameUseCase: SetLocationNameUseCase,

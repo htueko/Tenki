@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class RemoteWeatherDataSourceImpl @Inject constructor(
     private val remoteWeatherService: RemoteWeatherService,
-    @ApiKey
+    @param:ApiKey
     private val apiKey: String
 ) : RemoteWeatherDataSource {
 
