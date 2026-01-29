@@ -21,10 +21,41 @@ import com.htueko.tenki.core.util.logInfo
 import com.htueko.tenki.feature.home.view.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * The primary entry point and host [ComponentActivity] for the Tenki application.
+ *
+ * This activity handles the high-level UI orchestration using Jetpack Compose and is
+ * annotated with [AndroidEntryPoint] to enable Hilt dependency injection.
+ *
+ * ### Key Responsibilities:
+ * - **Edge-to-Edge**: Configures the window to draw behind system bars using [enableEdgeToEdge].
+ * - **Back Navigation**: Intercepts hardware back presses to provide custom logging and
+ * controlled activity finishing via [OnBackPressedCallback].
+ * - **Theme Provisioning**: Wraps the content in [TenkiTheme] to provide consistent
+ * colors, typography, and shapes.
+ * - **Root Navigation**: Sets [HomeScreen] as the root composable within a [Scaffold].
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    /**
+     * Cache for the class name used in logging.
+     * Derived via the [getClassName] utility.
+     */
     private val tag = getClassName<MainActivity>()
+
+    /**
+     * Initializes the activity and sets the Compose content.
+     * * Inside [setContent], the following local states are initialized:
+     * - **OnBackPressedCallback**: Custom handler for the hardware back button.
+     * - **SnackbarHostState**: State for managing [BasicSnackBar] visibility across the app.
+     * - **CoroutineScope**: A [rememberCoroutineScope] for launching side-effects
+     * within the Compose hierarchy.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     * previously being shut down then this Bundle contains the data it most
+     * recently supplied in [onSaveInstanceState].
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -34,6 +65,10 @@ class MainActivity : ComponentActivity() {
             // to handle the hardware onBackPressed
             val callBack =
                 object : OnBackPressedCallback(enabled = true) {
+                    /**
+                     * Custom handler for hardware back press.
+                     * Logs the event via [logInfo] and invokes [finish].
+                     */
                     override fun handleOnBackPressed() {
                         logInfo(tag = tag, "$tag handleOnBackPressed: called")
                         finish()
@@ -47,6 +82,10 @@ class MainActivity : ComponentActivity() {
             // to handle the task related to context
             val context = LocalContext.current
 
+            /**
+             * Host state for managing Snackbars.
+             * This state is hoisted here and passed down to [HomeScreen].
+             */
             val snackBarHostState = remember {
                 SnackbarHostState()
             }
