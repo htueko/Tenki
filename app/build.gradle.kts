@@ -1,5 +1,6 @@
+import org.jetbrains.dokka.DokkaDefaults.includeNonPublic
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.net.URI
+import java.net.URL
 
 plugins {
     alias(libs.plugins.android.application)
@@ -9,7 +10,6 @@ plugins {
     alias(libs.plugins.stability.analyzer)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kover)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -65,47 +65,6 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
         freeCompilerArgs.addAll("-progressive", "-Xcontext-receivers")
-    }
-}
-
-dokka {
-    dokkaPublications.html {
-        // The display name of my documentation site
-        moduleName.set("Tenki Weather App")
-        // Include the project README as the homepage
-        includes.from("README.md")
-        // Output path for GH Pages action
-        outputDirectory.set(layout.buildDirectory.dir("dokka/html"))
-
-        // --- Branding & Customization ---
-        pluginsConfiguration.html {
-            // My name in the footer
-            footerMessage.set("© 2026 htueko. Built with Dokka and Jetpack Compose.")
-
-            // Separate inherited members for cleaner API docs
-            separateInheritedMembers.set(true)
-
-            // For the logo-icon.svg in the project (later add it)
-            // customAssets.from(file("assets/logo-icon.svg"))
-        }
-
-    }
-    dokkaSourceSets.configureEach {
-        // Source Links: Adds a "Source" button on every class/function
-        sourceLink {
-            localDirectory.set(file("src/main/kotlin"))
-            remoteUrl.set(URI("https://github.com/htueko/Tenki/blob/master/app/src/main/kotlin"))
-            remoteLineSuffix.set("#L")
-        }
-        // Link to Android/Kotlin external docs
-        enableAndroidDocumentationLink.set(false)
-        enableKotlinStdLibDocumentationLink.set(false)
-        // Suppress generated code (e.g. Hilt, Room, BuildConfigs)
-        perPackageOption {
-            matchingRegex.set(".*\\.generated.*|.*\\.hilt.*|com\\.htueko\\.tenki\\.BuildConfig")
-            suppress.set(true)
-        }
-
     }
 }
 
