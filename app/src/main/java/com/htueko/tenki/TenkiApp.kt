@@ -1,10 +1,11 @@
 package com.htueko.tenki
 
 import android.app.Application
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.memory.MemoryCache
-import coil.util.DebugLogger
+import android.content.Context
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.memory.MemoryCache
+import coil3.util.DebugLogger
 import com.htueko.tenki.core.util.AppLogger
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
@@ -21,7 +22,7 @@ import javax.inject.Inject
  * to handle the instantiation.
  */
 @HiltAndroidApp
-class TenkiApp @Inject constructor() : Application(), ImageLoaderFactory {
+class TenkiApp @Inject constructor() : Application(), SingletonImageLoader.Factory {
 
     /**
      * Called when the application is starting, before any activity, service,
@@ -40,22 +41,19 @@ class TenkiApp @Inject constructor() : Application(), ImageLoaderFactory {
      * * The configuration includes:
      * - **Memory Cache**: Limited to 5MB to balance performance and memory footprint.
      * - **Logging**: Uses [DebugLogger] to monitor image requests during development.
-     * - **Cache Headers**: [ImageLoader.Builder.respectCacheHeaders] is set to `false`
-     * to prioritize local loading speed over server-side directives.
      *
      * @return A pre-configured [ImageLoader] for use throughout the app.
      */
-    override fun newImageLoader(): ImageLoader =
+    override fun newImageLoader(context: Context): ImageLoader =
         ImageLoader
-            .Builder(this)
+            .Builder(context)
             .memoryCache {
                 MemoryCache
-                    .Builder(this)
+                    .Builder()
                     .maxSizeBytes(5 * 1024 * 1024)
                     .build()
             }
             .logger(DebugLogger())
-            .respectCacheHeaders(false)
             .build()
 
 }

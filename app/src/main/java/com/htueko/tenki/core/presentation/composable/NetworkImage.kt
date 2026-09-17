@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.htueko.tenki.core.presentation.theme.TenkiTheme
 
 /**
@@ -36,7 +36,6 @@ fun NetworkImage(
             modifier = Modifier.fillMaxSize(),
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageUrl)
-                .crossfade(true)
                 .build(),
             contentDescription = contentDescription,
             onSuccess = { loadingState.value = false },
