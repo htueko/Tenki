@@ -1,6 +1,4 @@
-import org.jetbrains.dokka.DokkaDefaults.includeNonPublic
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.net.URL
 
 plugins {
     alias(libs.plugins.android.application)
@@ -14,12 +12,12 @@ plugins {
 
 android {
     namespace = "com.htueko.tenki"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.htueko.tenki"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -64,7 +62,6 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
-        freeCompilerArgs.addAll("-progressive", "-Xcontext-receivers")
     }
 }
 
@@ -89,6 +86,7 @@ dependencies {
 
     // image loading library
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // ui support libraries
     implementation(libs.androidx.constraintlayout.compose)
@@ -121,7 +119,6 @@ dependencies {
     // room database
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
     testImplementation(libs.androidx.room.testing)
 
     // Animation
